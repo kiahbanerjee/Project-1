@@ -1,25 +1,24 @@
 const container = document.querySelector('.library-container');
 const grid = document.querySelector('.library-grid');
 
-// State for dragging and position
+// where we are when we drag
 let isDragging = false;
 let startX = 0;
 let startY = 0;
 let currentX = 0;
 let currentY = 0;
 
-// Velocity for momentum scrolling
+// the speed in which the sroll happens
 let velocityX = 0;
 let velocityY = 0;
 let lastMoveTime = 0;
 let lastMoveX = 0;
 let lastMoveY = 0;
 
-// Grid configuration
-const CARD_WIDTH = 200;  // Changed from 400
-const CARD_HEIGHT = 250; // Changed from 500
-const MIN_SPACING = 50;  // Minimum space between cards
-const GRID_CELL_SIZE = 300; // Size of grid cells for positioning
+// Grid details
+const CARD_WIDTH = 200;  
+const CARD_HEIGHT = 250; 
+const GRID_CELL_SIZE = 300; 
 
 // Track which cards exist at which grid positions
 const cardPositions = new Set();
@@ -27,7 +26,7 @@ const cardLocations = new Map(); // Store actual x,y positions
 
 // Random offset within a grid cell
 function getRandomOffset() {
-    return Math.random() * 100 - 50; // Random offset between -50 and 50
+    return Math.random() * 100 - 50; 
 }
 
 // Create initial grid of cards
@@ -43,15 +42,15 @@ function createInitialCards() {
 // Create a card at a specific grid position
 function createCardAt(row, col) {
     const key = `${row},${col}`;
-    if (cardPositions.has(key)) return; // Already exists
+    if (cardPositions.has(key)) return;
     
     const card = document.createElement('article');
     card.className = 'card';
     card.dataset.row = row;
     card.dataset.col = col;
     
-    // All cards the same color
-    card.style.background = '#fff';
+   //color of the cards - can i put this in css?
+    card.style.background = '#dda272ff';
     
     // Calculate base position with random offset
     const baseX = col * GRID_CELL_SIZE;
@@ -63,6 +62,7 @@ function createCardAt(row, col) {
     cardLocations.set(key, { x, y });
     
     // Position the card
+    //marks the grid as occupied
     card.style.position = 'absolute';
     card.style.left = `${x}px`;
     card.style.top = `${y}px`;
@@ -71,12 +71,12 @@ function createCardAt(row, col) {
     cardPositions.add(key);
 }
 
-// Check if we need to create more cards based on current position
+// creates more cards if needed
 function updateVisibleCards() {
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
     
-    // Calculate which grid cells are visible (with buffer)
+    // the math to figure out which grid is visible on the screen
     const buffer = 2;
     
     const minCol = Math.floor((-currentX - viewportWidth) / GRID_CELL_SIZE) - buffer;
@@ -84,18 +84,18 @@ function updateVisibleCards() {
     const minRow = Math.floor((-currentY - viewportHeight) / GRID_CELL_SIZE) - buffer;
     const maxRow = Math.ceil((-currentY + viewportHeight) / GRID_CELL_SIZE) + buffer;
     
-    // Create cards in visible range
+    
     for (let row = minRow; row <= maxRow; row++) {
         for (let col = minCol; col <= maxCol; col++) {
             createCardAt(row, col);
         }
     }
     
-    // Optional: Remove cards that are too far away (memory optimization)
+    // optional - itll remove cards that are too far away
     removeDistantCards(minRow, maxRow, minCol, maxCol);
 }
 
-// Remove cards that are far from viewport
+// Remove cards that are far 
 function removeDistantCards(minRow, maxRow, minCol, maxCol) {
     const buffer = 4;
     const cards = grid.querySelectorAll('.card');
@@ -114,17 +114,17 @@ function removeDistantCards(minRow, maxRow, minCol, maxCol) {
     });
 }
 
-// Update grid transform
+// moves the grid
 function updateTransform() {
     grid.style.transform = `translateX(${currentX}px) translateY(${currentY}px)`;
     updateVisibleCards();
 }
 
-// === MOUSE EVENTS ===
+//mouse - click and drag
 
 container.addEventListener('mousedown', (e) => {
     isDragging = true;
-    container.classList.add('dragging');
+    container.classList.add('dragging'); // here or css?
     
     startX = e.pageX;
     startY = e.pageY;
@@ -160,7 +160,7 @@ container.addEventListener('mouseleave', () => {
     container.classList.remove('dragging');
 });
 
-// === TOUCH EVENTS ===
+// mouse - swpiping
 
 container.addEventListener('touchstart', (e) => {
     isDragging = true;
@@ -193,7 +193,7 @@ container.addEventListener('touchmove', (e) => {
     
     updateTransform();
     
-    // Track velocity
+    // speed
     const now = Date.now();
     const timeDelta = now - lastMoveTime;
     if (timeDelta > 0) {
@@ -210,7 +210,7 @@ container.addEventListener('touchend', () => {
     applyMomentum();
 }, { passive: true });
 
-// === WHEEL/TRACKPAD SCROLLING ===
+// trackpad
 
 container.addEventListener('wheel', (e) => {
     e.preventDefault();
@@ -221,7 +221,7 @@ container.addEventListener('wheel', (e) => {
     updateTransform();
 }, { passive: false });
 
-// === MOMENTUM SCROLLING ===
+//momentum
 
 function applyMomentum() {
     if (Math.abs(velocityX) < 0.01 && Math.abs(velocityY) < 0.01) {
@@ -239,7 +239,7 @@ function applyMomentum() {
     requestAnimationFrame(applyMomentum);
 }
 
-// Prevent text selection
+// makes sure theres no highlighting when dragging
 container.addEventListener('selectstart', (e) => {
     if (isDragging) e.preventDefault();
 });
