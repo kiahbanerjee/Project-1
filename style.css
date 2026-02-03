@@ -1,0 +1,45 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #000;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+}
+
+/* Main container with perspective for 3D effect */
+.library-container {
+    width: 100%;
+    height: 100vh;
+    perspective: 1500px;
+    perspective-origin: center center;
+    overflow: hidden;
+    cursor: grab;
+}
+
+.library-container.dragging {
+    cursor: grabbing;
+}
+
+/* Grid layout for cards */
+.library-grid {
+    transform-style: preserve-3d;
+    position: relative;
+    user-select: none;
+    width: 100%;
+    height: 100%;
+}
+
+/* Individual cards */
+.card {
+    width: 200px;   /* Changed from 400px */
+    height: 250px;  /* Changed from 500px */
+    background: #fff;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    position: absolute;
+}
