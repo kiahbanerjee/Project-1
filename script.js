@@ -23,16 +23,16 @@ let lastMoveY = 0;
 
 
 const cardRegistry = new Map();
-const MAX_CARDS = 50; // Reduced from 150
-const SPAWN_DISTANCE = 2000; // Distance from center to spawn new cards
-const CULL_DISTANCE = 3000; // Distance from center to remove cards
+const MAX_CARDS = 55; 
+const SPAWN_DISTANCE = 2000; 
+const CULL_DISTANCE = 3000; 
 
 
 function getRandomPosition() {
    return {
-       x: (Math.random() - 0.5) * 4000, // Reduced from 8000
-       y: (Math.random() - 0.5) * 3000, // Reduced from 6000
-       z: (Math.random() - 0.5) * 2000  // Reduced from 4000
+       x: (Math.random() - 0.5) * 4000, 
+       y: (Math.random() - 0.5) * 3000, 
+       z: (Math.random() - 0.5) * 2000  
    };
 }
 
@@ -132,11 +132,16 @@ function updateVisibleCards() {
        if (distance > CULL_DISTANCE) {
            card.remove();
            cardRegistry.delete(id);
+       } else {
+           // Depth-of-field: blur cards based on Z distance
+           const zDistance = Math.abs(dz);
+           const blurAmount = Math.max(0, (zDistance / 700) * 2);
+           card.style.filter = `blur(${blurAmount}px)`;
        }
    });
 
 
-   // Spawn new cards to maintain count
+   
    const missingCards = MAX_CARDS - cardRegistry.size;
    for (let i = 0; i < missingCards; i++) {
        const newId = `card-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -199,7 +204,7 @@ container.addEventListener('touchmove', (e) => {
 
 
    if (e.touches.length === 2 && isPinching) {
-       // PINCH ZOOM - Z-AXIS
+       // PINCH ZOOM 
        const touch1 = e.touches[0];
        const touch2 = e.touches[1];
        const currentDistance = Math.hypot(
@@ -208,18 +213,15 @@ container.addEventListener('touchmove', (e) => {
        );
 
 
-       // Calculate the change in distance
        const deltaDistance = currentDistance - lastPinchDistance;
       
-       // Move along Z-axis (pinch in = zoom in/move forward, pinch out = zoom out/move back)
-       const zoomSpeed = 10; // Adjust this value to control zoom sensitivity
-       currentZ -= deltaDistance * zoomSpeed; // Reversed direction
+       const zoomSpeed = 10; // adjust this to chnage the sensitivity of the zoom
+       currentZ -= deltaDistance * zoomSpeed; 
 
 
        lastPinchDistance = currentDistance;
        updateTransform();
    } else if (isDragging && e.touches.length === 1) {
-       // DRAG PAN
        const touch = e.touches[0];
        const deltaX = touch.pageX - startX;
        const deltaY = touch.pageY - startY;
@@ -256,7 +258,7 @@ container.addEventListener('touchend', (e) => {
 }, { passive: true });
 
 
-// Mouse events
+// Mouse 
 container.addEventListener('mousedown', (e) => {
    isDragging = true;
    container.classList.add('dragging');
@@ -291,20 +293,16 @@ container.addEventListener('mouseleave', () => {
 });
 
 
-// Wheel controls - Z-axis zoom
 container.addEventListener('wheel', (e) => {
    e.preventDefault();
    const moveSpeed = 2;
 
 
    if (e.shiftKey) {
-       // Shift + wheel = Z-axis movement
        currentZ += e.deltaY * moveSpeed;
    } else if (e.ctrlKey || e.metaKey) {
-       // Ctrl/Cmd + wheel = Z-axis zoom (like pinch)
        currentZ += e.deltaY * moveSpeed;
    } else {
-       // Normal wheel = X/Y panning
        currentX -= e.deltaX * moveSpeed;
        currentY -= e.deltaY * moveSpeed;
    }
@@ -334,7 +332,6 @@ container.addEventListener('selectstart', (e) => {
 });
 
 
-// Initialize
 createInitialCards();
 updateVisibleCards();
 

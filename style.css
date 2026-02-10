@@ -5,10 +5,42 @@
 }
 
 body {
-    background: #ffff;
     overflow: hidden;
     height: 100vh;
     width: 100vw;
+    position: relative;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: -20px;
+    left: -20px;
+    width: calc(100% + 30px);
+    height: calc(100% + 30px);
+    background: url('sand2.avif') no-repeat center center / cover;
+    filter: blur(1.5px);
+    z-index: -1;
+}
+
+.title {
+    position: fixed;
+    top: 94%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    color: #f4f1de;
+    font-size: 1.2rem;
+    pointer-events: none;
+font-family: new-hero, sans-serif;
+font-weight: 380;
+font-style: normal;
+    background-color: rgba(255, 255, 255, 0.045);
+    padding: 7px;
+    backdrop-filter: blur(10px); 
+    border: 0.5px solid rgba(255, 255, 255, 0.18); 
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.007); 
+    border-radius: 10px;
 }
 
 
@@ -38,8 +70,9 @@ body {
 .card {
     width: 200px;  
     height: 250px;  
-    background: #CBBD93; 
+    background: #f4f1de; 
     cursor: pointer;
     border-radius: 10px;
     position: absolute;
+    border: black solid 1px;
 }
