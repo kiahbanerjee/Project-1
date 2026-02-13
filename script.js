@@ -23,7 +23,7 @@ let lastMoveY = 0;
 
 
 const cardRegistry = new Map();
-const MAX_CARDS = 55; 
+const MAX_CARDS = 36;
 const SPAWN_DISTANCE = 2000; 
 const CULL_DISTANCE = 3000; 
 
@@ -38,14 +38,15 @@ function getRandomPosition() {
 
 
 function getRandomScale() {
-   return 0.6 + Math.random() * 0.8;
+   return 1;
 }
 
 
-function createRandomCard(id) {
+function createRandomCard(id, label) {
    const card = document.createElement('article');
    card.className = 'card';
    card.dataset.id = id;
+   if (label) card.textContent = label;
 
 
    const pos = getRandomPosition();
@@ -56,7 +57,8 @@ function createRandomCard(id) {
        pos,
        scale,
        baseLeft: pos.x,
-       baseTop: pos.y
+       baseTop: pos.y,
+       label
    });
 
 
@@ -71,10 +73,11 @@ function createRandomCard(id) {
 }
 
 
-function createRandomCardAt(id, x, y, z) {
+function createRandomCardAt(id, x, y, z, label) {
    const card = document.createElement('article');
    card.className = 'card';
    card.dataset.id = id;
+   if (label) card.textContent = label;
 
 
    const pos = { x, y, z };
@@ -85,7 +88,8 @@ function createRandomCardAt(id, x, y, z) {
        pos,
        scale,
        baseLeft: pos.x,
-       baseTop: pos.y
+       baseTop: pos.y,
+       label
    });
 
 
@@ -100,9 +104,48 @@ function createRandomCardAt(id, x, y, z) {
 }
 
 
+const cardTexts = [
+   "Text for card 1",
+   "Text for card 2",
+   "Text for card 3",
+   "Text for card 4",
+   "Text for card 5",
+   "Text for card 6",
+   "Text for card 7",
+   "Text for card 8",
+   "Text for card 9",
+   "Text for card 10",
+   "Text for card 11",
+   "Text for card 12",
+   "Text for card 13",
+   "Text for card 14",
+   "Text for card 15",
+   "Text for card 16",
+   "Text for card 17",
+   "Text for card 18",
+   "Text for card 19",
+   "Text for card 20",
+   "Text for card 21",
+   "Text for card 22",
+   "Text for card 23",
+   "Text for card 24",
+   "Text for card 25",
+   "Text for card 26",
+   "Text for card 27",
+   "Text for card 28",
+   "Text for card 29",
+   "Text for card 30",
+   "Text for card 31",
+   "Text for card 32",
+   "Text for card 33",
+   "Text for card 34",
+   "Text for card 35",
+   "Text for card 36",
+];
+
 function createInitialCards() {
    for (let i = 0; i < MAX_CARDS; i++) {
-       createRandomCard(`card-${i}`);
+       createRandomCard(`card-${i}`, cardTexts[i]);
    }
 }
 
@@ -112,51 +155,41 @@ function updateVisibleCards() {
    const centerY = -currentY + window.innerHeight / 2;
    const centerZ = -currentZ;
 
-
    const cards = Array.from(grid.querySelectorAll('.card'));
+   const culledCards = [];
 
-
-   // Remove cards that are too far
    cards.forEach(card => {
        const id = card.dataset.id;
        const data = cardRegistry.get(id);
        if (!data) return;
-
 
        const dx = data.pos.x - centerX;
        const dy = data.pos.y - centerY;
        const dz = data.pos.z - centerZ;
        const distance = Math.sqrt(dx*dx + dy*dy + dz*dz);
 
-
        if (distance > CULL_DISTANCE) {
+           culledCards.push({ id, label: data.label });
            card.remove();
            cardRegistry.delete(id);
        } else {
-           // Depth-of-field: blur cards based on Z distance
-           const zDistance = Math.abs(dz);
-           const blurAmount = Math.max(0, (zDistance / 700) * 2);
+           const blurAmount = Math.max(0, (dz / 700) * 2);
            card.style.filter = `blur(${blurAmount}px)`;
        }
    });
 
-
-   
-   const missingCards = MAX_CARDS - cardRegistry.size;
-   for (let i = 0; i < missingCards; i++) {
-       const newId = `card-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-      
-       // Spawn cards around the current viewport position
+   // Respawn culled cards nearby with their original labels
+   culledCards.forEach(({ id, label }) => {
        const angle = Math.random() * Math.PI * 2;
        const distance = SPAWN_DISTANCE * (0.5 + Math.random() * 0.5);
        const elevationAngle = (Math.random() - 0.5) * Math.PI;
-      
+
        const x = centerX + Math.cos(angle) * distance * Math.cos(elevationAngle);
        const y = centerY + Math.sin(angle) * distance * Math.cos(elevationAngle);
        const z = centerZ + Math.sin(elevationAngle) * distance;
-      
-       createRandomCardAt(newId, x, y, z);
-   }
+
+       createRandomCardAt(id, x, y, z, label);
+   });
 }
 
 
@@ -214,10 +247,18 @@ container.addEventListener('touchmove', (e) => {
 
 
        const deltaDistance = currentDistance - lastPinchDistance;
-      
-       const zoomSpeed = 10; // adjust this to chnage the sensitivity of the zoom
-       currentZ -= deltaDistance * zoomSpeed; 
 
+       const zoomSpeed = 25;
+       const zDelta = deltaDistance * zoomSpeed;
+       currentZ += zDelta;
+
+       // Track Z velocity for momentum after pinch ends
+       const now = Date.now();
+       const timeDelta = now - lastMoveTime;
+       if (timeDelta > 0) {
+           velocityZ = (zDelta / timeDelta) * 3;
+       }
+       lastMoveTime = now;
 
        lastPinchDistance = currentDistance;
        updateTransform();
@@ -253,6 +294,10 @@ container.addEventListener('touchend', (e) => {
    }
    if (e.touches.length === 0) {
        isDragging = false;
+       applyMomentum();
+   }
+   // Apply zoom momentum after pinch ends
+   if (isPinching === false && Math.abs(velocityZ) > 0.01) {
        applyMomentum();
    }
 }, { passive: true });
@@ -295,13 +340,13 @@ container.addEventListener('mouseleave', () => {
 
 container.addEventListener('wheel', (e) => {
    e.preventDefault();
-   const moveSpeed = 2;
+   const moveSpeed = 5;
 
 
    if (e.shiftKey) {
-       currentZ += e.deltaY * moveSpeed;
+       currentZ -= e.deltaY * moveSpeed;
    } else if (e.ctrlKey || e.metaKey) {
-       currentZ += e.deltaY * moveSpeed;
+       currentZ -= e.deltaY * moveSpeed;
    } else {
        currentX -= e.deltaX * moveSpeed;
        currentY -= e.deltaY * moveSpeed;
@@ -331,6 +376,85 @@ container.addEventListener('selectstart', (e) => {
    if (isDragging) e.preventDefault();
 });
 
+
+// Focus mode
+const overlay = document.querySelector('.focus-overlay');
+let focusedCard = null;
+let dragMoved = false;
+
+let focusClone = null;
+
+function openFocusView(card) {
+   focusedCard = card;
+   focusClone = card.cloneNode(true);
+   // Clear inline styles so CSS class takes over
+   focusClone.removeAttribute('style');
+   focusClone.classList.add('focused');
+   document.body.appendChild(focusClone);
+   overlay.classList.add('active');
+   // Trigger animation on next frame
+   requestAnimationFrame(() => {
+       focusClone.classList.add('visible');
+   });
+
+   focusClone.addEventListener('click', closeFocusView);
+}
+
+function closeFocusView() {
+   if (!focusedCard) return;
+   if (focusClone) {
+       focusClone.remove();
+       focusClone = null;
+   }
+   overlay.classList.remove('active');
+   focusedCard = null;
+}
+
+let dragStartPos = { x: 0, y: 0 };
+const DRAG_THRESHOLD = 5;
+
+container.addEventListener('mousedown', (e) => {
+   dragStartPos = { x: e.pageX, y: e.pageY };
+   dragMoved = false;
+});
+
+container.addEventListener('mouseup', (e) => {
+   const dx = e.pageX - dragStartPos.x;
+   const dy = e.pageY - dragStartPos.y;
+   if (Math.sqrt(dx * dx + dy * dy) > DRAG_THRESHOLD) {
+       dragMoved = true;
+   }
+});
+
+container.addEventListener('click', (e) => {
+   if (dragMoved) return;
+   if (focusedCard) return;
+   const card = e.target.closest('.card');
+   if (!card) return;
+   openFocusView(card);
+});
+
+// Touch tap support
+let touchStartPos = { x: 0, y: 0 };
+container.addEventListener('touchstart', (e) => {
+   if (e.touches.length === 1) {
+       touchStartPos = { x: e.touches[0].pageX, y: e.touches[0].pageY };
+   }
+}, { passive: true });
+
+container.addEventListener('touchend', (e) => {
+   if (focusedCard) return;
+   const touch = e.changedTouches[0];
+   const dx = touch.pageX - touchStartPos.x;
+   const dy = touch.pageY - touchStartPos.y;
+   if (Math.sqrt(dx * dx + dy * dy) < DRAG_THRESHOLD) {
+       const card = document.elementFromPoint(touch.clientX, touch.clientY)?.closest('.card');
+       if (card) openFocusView(card);
+   }
+}, { passive: true });
+
+overlay.addEventListener('click', closeFocusView);
+overlay.addEventListener('touchend', closeFocusView);
 
 createInitialCards();
 updateVisibleCards();
