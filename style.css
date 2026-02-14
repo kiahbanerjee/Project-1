@@ -92,8 +92,9 @@ font-style: light;
     transition: background-color 0.2s ease;
 }
 
-.card u:hover {
+.card.focused u:hover {
     background-color: #e76f5180;
+    cursor: pointer;
 }
 
 .card.focused {

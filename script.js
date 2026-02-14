@@ -349,7 +349,20 @@ function openFocusView(card) {
        focusClone.classList.add('visible');
    });
 
-   focusClone.addEventListener('click', closeFocusView);
+   focusClone.addEventListener('click', (e) => {
+       const link = e.target.closest('u[data-link]');
+       if (link) {
+           e.stopPropagation();
+           const targetId = link.dataset.link;
+           const targetCard = grid.querySelector(`.card[data-id="${targetId}"]`);
+           if (targetCard) {
+               closeFocusView();
+               setTimeout(() => openFocusView(targetCard), 100);
+           }
+           return;
+       }
+       closeFocusView();
+   });
 }
 
 function closeFocusView() {
