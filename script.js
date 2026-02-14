@@ -131,7 +131,6 @@ function updateVisibleCards() {
        }
    });
 
-   // Respawn culled cards nearby with their original labels
    culledCards.forEach(({ id, label }) => {
        const angle = Math.random() * Math.PI * 2;
        const distance = SPAWN_DISTANCE * (0.5 + Math.random() * 0.5);
