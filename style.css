@@ -87,6 +87,15 @@ font-style: normal;
     text-align: justify left;
 }
 
+.card u {
+    text-decoration: underline;
+    transition: background-color 0.2s ease;
+}
+
+.card u:hover {
+    background-color: #e76f5180;
+}
+
 .card.focused {
     position: fixed;
     left: 50%;
