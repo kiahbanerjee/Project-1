@@ -158,7 +158,6 @@ function updateTransform() {
 
 container.addEventListener('touchstart', (e) => {
    if (e.touches.length === 2) {
-       // PINCH START
        e.preventDefault();
        isPinching = true;
        isDragging = false;
@@ -170,7 +169,7 @@ container.addEventListener('touchstart', (e) => {
        );
        lastPinchDistance = initialPinchDistance;
    } else if (e.touches.length === 1) {
-       // DRAG START
+
        isDragging = true;
        isPinching = false;
        const touch = e.touches[0];
@@ -189,7 +188,6 @@ container.addEventListener('touchmove', (e) => {
 
 
    if (e.touches.length === 2 && isPinching) {
-       // PINCH ZOOM 
        const touch1 = e.touches[0];
        const touch2 = e.touches[1];
        const currentDistance = Math.hypot(
@@ -248,14 +246,13 @@ container.addEventListener('touchend', (e) => {
        isDragging = false;
        applyMomentum();
    }
-   // Apply zoom momentum after pinch ends
    if (isPinching === false && Math.abs(velocityZ) > 0.01) {
        applyMomentum();
    }
 }, { passive: true });
 
 
-// Mouse 
+// mouse movement
 container.addEventListener('mousedown', (e) => {
    isDragging = true;
    container.classList.add('dragging');
@@ -329,7 +326,7 @@ container.addEventListener('selectstart', (e) => {
 });
 
 
-// Focus mode
+// when the card is in focus
 const overlay = document.querySelector('.focus-overlay');
 let focusedCard = null;
 let dragMoved = false;
@@ -399,7 +396,6 @@ container.addEventListener('click', (e) => {
    openFocusView(card);
 });
 
-// Touch tap support
 let touchStartPos = { x: 0, y: 0 };
 container.addEventListener('touchstart', (e) => {
    if (e.touches.length === 1) {
