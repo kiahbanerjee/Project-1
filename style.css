@@ -101,7 +101,7 @@ font-style: light;
     position: relative;
     font-size: 1.2em;
     vertical-align: baseline;
-    color: red;
+    color: rgb(115, 65, 3);
 }
 
 .card.focused .ext-ref {
