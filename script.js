@@ -126,8 +126,8 @@ function updateVisibleCards() {
            card.remove();
            cardRegistry.delete(id);
        } else {
-           const blurAmount = Math.max(0, (dz / 700) * 2);
-           card.style.filter = `blur(${blurAmount}px)`;
+           const blurAmount = Math.max(0, (distance - 800) / 300);
+           card.style.filter = distance > 800 ? `blur(${blurAmount}px)` : 'none';
        }
    });
 
@@ -336,14 +336,27 @@ let focusClone = null;
 function openFocusView(card) {
    focusedCard = card;
    focusClone = card.cloneNode(true);
-   // Clear inline styles so CSS class takes over
    focusClone.removeAttribute('style');
    focusClone.classList.add('focused');
+
+   // Get the card's current screen position
+   const rect = card.getBoundingClientRect();
+   const startLeft = rect.left + rect.width / 2;
+   const startTop = rect.top + rect.height / 2;
+
+   // Set starting position at the card's actual location
+   focusClone.style.left = `${startLeft}px`;
+   focusClone.style.top = `${startTop}px`;
+   focusClone.style.transform = 'translate(-50%, -50%) scale(1)';
+
    document.body.appendChild(focusClone);
    overlay.classList.add('active');
-   // Trigger animation on next frame
+
+   // Animate to center on next frame
    requestAnimationFrame(() => {
-       focusClone.classList.add('visible');
+       focusClone.style.left = '50%';
+       focusClone.style.top = '50%';
+       focusClone.style.transform = 'translate(-50%, -50%) scale(2.5)';
    });
 
    focusClone.addEventListener('click', (e) => {
@@ -416,6 +429,53 @@ container.addEventListener('touchend', (e) => {
 
 overlay.addEventListener('click', closeFocusView);
 overlay.addEventListener('touchend', closeFocusView);
+
+// External link preview
+const linkPreview = document.createElement('div');
+linkPreview.className = 'link-preview';
+document.body.appendChild(linkPreview);
+
+let currentPreviewUrl = null;
+
+document.addEventListener('mouseover', (e) => {
+   const ref = e.target.closest('.card.focused .ext-ref');
+   if (ref) {
+       const url = ref.dataset.url;
+       if (url !== currentPreviewUrl) {
+           currentPreviewUrl = url;
+           linkPreview.innerHTML = '';
+           const iframe = document.createElement('iframe');
+           iframe.src = url;
+           iframe.sandbox = 'allow-same-origin';
+           linkPreview.appendChild(iframe);
+       }
+       linkPreview.classList.add('visible');
+   }
+});
+
+document.addEventListener('mousemove', (e) => {
+   if (linkPreview.classList.contains('visible')) {
+       linkPreview.style.left = `${e.clientX + 15}px`;
+       linkPreview.style.top = `${e.clientY - 210}px`;
+   }
+});
+
+document.addEventListener('mouseout', (e) => {
+   const ref = e.target.closest('.ext-ref');
+   if (ref) {
+       linkPreview.classList.remove('visible');
+   }
+});
+
+document.addEventListener('click', (e) => {
+   const ref = e.target.closest('.card.focused .ext-ref');
+   if (ref) {
+       e.stopPropagation();
+       linkPreview.classList.remove('visible');
+       currentPreviewUrl = null;
+       window.open(ref.dataset.url, '_blank');
+   }
+});
 
 createInitialCards();
 updateVisibleCards();
