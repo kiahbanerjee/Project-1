@@ -4,6 +4,46 @@
     box-sizing: border-box;
 }
 
+@keyframes grow-in {
+    from { transform: scale(0.2); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+}
+
+.loading-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    transition: opacity 0.8s ease;
+}
+
+.loading-screen.fade-out {
+    opacity: 0;
+}
+
+.loading-img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+
+    opacity: 0.85;
+    animation: grow-in 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.loading-text {
+    color: #333;
+    font-family: "prestige-elite-std", monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-align: center;
+    animation: grow-in 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
 body {
     overflow: hidden;
     height: 100vh;
