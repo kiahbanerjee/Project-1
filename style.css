@@ -2,6 +2,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    cursor: none !important;
 }
 
 @keyframes grow-in {
@@ -35,6 +36,14 @@
     animation: grow-in 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
+.loading-title {
+    font-family: "powell", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 1.1rem;
+    animation: grow-in 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
 .loading-text {
     color: #333;
     font-family: "prestige-elite-std", monospace;
@@ -49,6 +58,17 @@ body {
     height: 100vh;
     width: 100vw;
     position: relative;
+}
+
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: url('Texturelabs_Soil_124S.jpg') center center / cover;
+    opacity: 0.35;
+    mix-blend-mode: multiply;
+    z-index: -1;
+    pointer-events: none;
 }
 
 body::before {
@@ -71,17 +91,11 @@ body::before {
     transform: translateX(-50%);
     z-index: 10;
     color: #f4f1de;
-    font-size: 1.2rem;
+    font-size: 1.6rem;
     pointer-events: none;
-font-family: new-hero, sans-serif;
-font-weight: 250;
-font-style: light;
-    background-color: rgba(255, 255, 255, 0.045);
-    padding: 7px;
-    backdrop-filter: blur(10px); 
-    border: 0.5px solid rgba(255, 255, 255, 0.18); 
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.007); 
-    border-radius: 20px;
+font-family: "powell", sans-serif;
+font-weight: 400;
+font-style: normal;
 }
 
 
@@ -120,10 +134,23 @@ font-style: light;
     font-family: "prestige-elite-std", monospace;
     font-weight: 400;
     font-style: normal;
-    color: #000000;
+    color: #1a1008;
     overflow: auto;
     font-size: 9px;
     text-align: justify left;
+    text-shadow: 0 0 1px rgba(15, 8, 0, 0.3), 0.2px 0.2px 0.6px rgba(15, 8, 0, 0.1);
+}
+
+.card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 10px;
+    background: url('Texturelabs_Paper_345S.jpg') center center / cover,
+                url('Texturelabs_Paper_378S (1).jpg') center center / cover;
+    opacity: 0.72;
+    mix-blend-mode: multiply;
+    pointer-events: none;
 }
 
 .card u {

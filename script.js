@@ -477,6 +477,75 @@ document.addEventListener('click', (e) => {
    }
 });
 
+// Sand cursor
+const sandCanvas = document.createElement('canvas');
+sandCanvas.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:99999;';
+document.body.appendChild(sandCanvas);
+const sandCtx = sandCanvas.getContext('2d');
+
+function resizeSandCanvas() {
+    sandCanvas.width = window.innerWidth;
+    sandCanvas.height = window.innerHeight;
+}
+resizeSandCanvas();
+window.addEventListener('resize', resizeSandCanvas);
+
+const sandParticles = [];
+const sandColors = ['#c4a882', '#b8976e', '#d4b896', '#a08060', '#c8aa80', '#bfa070', '#cdb48a'];
+let mouseX = -999, mouseY = -999;
+
+document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    for (let i = 0; i < 5; i++) {
+        sandParticles.push({
+            x: mouseX + (Math.random() - 0.5) * 6,
+            y: mouseY + (Math.random() - 0.5) * 4,
+            vx: (Math.random() - 0.5) * 1.2,
+            vy: Math.random() * 0.8 + 0.3,
+            size: Math.random() * 1.4 + 0.4,
+            alpha: 0.75 + Math.random() * 0.25,
+            color: sandColors[Math.floor(Math.random() * sandColors.length)]
+        });
+    }
+});
+
+function animateSand() {
+    sandCtx.clearRect(0, 0, sandCanvas.width, sandCanvas.height);
+
+
+    for (let i = sandParticles.length - 1; i >= 0; i--) {
+        const p = sandParticles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.12;
+        p.vx *= 0.98;
+        p.alpha -= 0.012;
+
+        if (p.alpha <= 0 || p.y > sandCanvas.height) {
+            sandParticles.splice(i, 1);
+            continue;
+        }
+
+        sandCtx.globalAlpha = p.alpha;
+        sandCtx.fillStyle = p.color;
+        sandCtx.beginPath();
+        sandCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        sandCtx.fill();
+    }
+
+    // small cursor dot
+    sandCtx.globalAlpha = 0.9;
+    sandCtx.fillStyle = '#c4a882';
+    sandCtx.beginPath();
+    sandCtx.arc(mouseX, mouseY, 2.5, 0, Math.PI * 2);
+    sandCtx.fill();
+
+    sandCtx.globalAlpha = 1;
+    requestAnimationFrame(animateSand);
+}
+animateSand();
+
 createInitialCards();
 updateVisibleCards();
 
