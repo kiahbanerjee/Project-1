@@ -46,7 +46,9 @@
 
 .loading-text {
     color: #333;
-    font-family: "prestige-elite-std", monospace;
+    font-family: "chandler42regular", sans-serif;
+    font-weight: 300;
+    font-style: normal;
     font-size: 0.8rem;
     letter-spacing: 0.08em;
     text-align: center;
