@@ -131,14 +131,13 @@ font-style: normal;
     position: absolute;
     transition: none;
     padding: 15px;
-    font-family: "prestige-elite-std", monospace;
-    font-weight: 400;
+    font-family: "chandler42regular", sans-serif;
+    font-weight: 300;
     font-style: normal;
     color: #1a1008;
     overflow: auto;
     font-size: 9px;
     text-align: justify left;
-    text-shadow: 0 0 1px rgba(15, 8, 0, 0.3), 0.2px 0.2px 0.6px rgba(15, 8, 0, 0.1);
 }
 
 .card::after {
@@ -168,7 +167,9 @@ font-style: normal;
     position: relative;
     font-size: 1.2em;
     vertical-align: baseline;
-    color: rgb(115, 65, 3);
+    color: #e8650a;
+    font-weight: 700;
+    font-family: "prestige-elite-std", monospace;
 }
 
 .card.focused .ext-ref {
